@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import KeyboardArrowRightOutlinedIcon from "@material-ui/icons/KeyboardArrowRightOutlined";
-import "./App.css";
 import QuestionCard from "./components/QustionCard";
 import { getAllQuestions } from "./Api";
 import { useEffect } from "react";

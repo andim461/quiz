@@ -1,5 +1,9 @@
 # Quiz
 
+## Доступен по ссылке: https://andim461.github.io/quiz/
+
 ## Available Scripts
 
-### `yarn start`
+### `npm start` - запуск dev-сборки
+
+### `npm run build` - запуск prod-сборки
