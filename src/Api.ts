@@ -1,20 +1,8 @@
 import { shuffle } from "lodash";
-export enum Difficulty {
-  Easy = "easy",
-  Medium = "medium",
-  Hard = "hard",
-}
-export interface Question {
-  category: string;
-  correct_answer: string;
-  difficulty: Difficulty;
-  incorrect_answers: string[];
-  question: string;
-  type: string;
-}
-export interface QuestionAnswer extends Question {
-  answers: string[];
-}
+import Question from "./interfaces/Question";
+import Difficulty from "./interfaces/Difficulty";
+import QuestionAnswer from "./interfaces/QuestionAnswer";
+
 export const fetchQuestions = async (difficulty: Difficulty, num: number) => {
   const res = await fetch(
     `https://opentdb.com/api.php?amount=${num}&difficulty=${difficulty}`

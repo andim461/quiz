@@ -1,11 +1,13 @@
 import React from "react";
-import { QuestionAnswer } from "../Api";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
+import questionsStore from "../store/questionsStore";
+import statisticStore from "../store/statisticStore";
+import { observer } from "mobx-react-lite";
 
 const useStyles = makeStyles({
   card: {
@@ -25,16 +27,17 @@ const useStyles = makeStyles({
   },
 });
 
-interface CardProps {
-  questionInfo: QuestionAnswer;
-  questionNum: number;
-  onAnswerCallback: (answer: string) => void;
-  answer: string | null;
-}
-const QuestionCard = (props: CardProps) => {
+const QuestionCard = observer(() => {
   const classes = useStyles();
+  const questionData = questionsStore.getCurrentQuestion();
+
   const onAnswer = (answer: string) => {
-    props.onAnswerCallback(answer);
+    questionsStore.setAnswer(answer);
+    if (questionsStore.questions) {
+      if (answer === questionData.correct_answer) {
+        statisticStore.incrementDifficult(questionData.difficulty);
+      }
+    }
   };
 
   return (
@@ -42,25 +45,27 @@ const QuestionCard = (props: CardProps) => {
       <CardContent>
         <div className={classes.cardHead}>
           <Typography color="textSecondary" gutterBottom>
-            {props.questionNum + 1}/15
+            {questionsStore.currentIndex + 1}/15
           </Typography>
           <Typography color="textSecondary" gutterBottom>
-            {props.questionInfo.difficulty}
+            {questionData.difficulty}
           </Typography>
         </div>
         <Typography
           variant="h5"
           component="h2"
-          dangerouslySetInnerHTML={{ __html: props.questionInfo.question }}
+          dangerouslySetInnerHTML={{
+            __html: questionData.question,
+          }}
         ></Typography>
       </CardContent>
       <CardActions>
-        {props.questionInfo.answers.map((answer, index) => {
+        {questionData.answers.map((answer, index) => {
           let color = "#FFF";
-          if (props.answer) {
-            if (answer === props.questionInfo.correct_answer) {
+          if (questionsStore.currentAnswer) {
+            if (answer === questionData.correct_answer) {
               color = "rgba(0, 255, 0, 0.45)";
-            } else if (props.answer === answer) {
+            } else if (questionsStore.currentAnswer === answer) {
               color = "rgba(255, 0, 0, 0.45)";
             }
           }
@@ -70,7 +75,7 @@ const QuestionCard = (props: CardProps) => {
               variant="outlined"
               key={answer}
               style={{ background: color, color: "#000" }}
-              disabled={!!props.answer}
+              disabled={!!questionsStore.currentAnswer}
               onClick={() => {
                 onAnswer(answer);
               }}
@@ -82,5 +87,5 @@ const QuestionCard = (props: CardProps) => {
       </CardActions>
     </Card>
   );
-};
+});
 export default QuestionCard;

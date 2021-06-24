@@ -3,13 +3,15 @@ import Button from "@material-ui/core/Button";
 import KeyboardArrowRightOutlinedIcon from "@material-ui/icons/KeyboardArrowRightOutlined";
 import "./App.css";
 import QuestionCard from "./components/QustionCard";
-import { getAllQuestions, QuestionAnswer } from "./Api";
+import { getAllQuestions } from "./Api";
 import { useEffect } from "react";
 import ReactLoading from "react-loading";
 import Statistic from "./components/Statistic";
-import Statistics from "./interfaces/Statistics";
 import ReplayIcon from "@material-ui/icons/Replay";
 import { makeStyles } from "@material-ui/styles";
+import { observer } from "mobx-react-lite";
+import statisticStore from "./store/statisticStore";
+import questionsStore from "./store/questionsStore";
 
 const useStyles = makeStyles({
   app: {
@@ -37,64 +39,24 @@ const useStyles = makeStyles({
   },
 });
 
-function App() {
+const App = observer(() => {
   const classes = useStyles();
   const NUMBER_OF_QUESTION = 15;
-  const [questionNum, setQuestionNum] = useState<number>(0);
   const [isLoading, setLoading] = useState<boolean>(true);
-  const [questions, setQuestions] = useState<QuestionAnswer[] | null>(null);
-  const [isAnswered, setAnswered] = useState<boolean>(false);
-  const [answerState, setAnswer] = useState<string | null>(null);
-  const [statistics, setStatistics] = useState<Statistics>({
-    easy: 0,
-    medium: 0,
-    hard: 0,
-  });
 
   const prepareQuestions = async () => {
     setLoading(true);
-    setQuestionNum(0);
-    setStatistics({
-      easy: 0,
-      medium: 0,
-      hard: 0,
-    });
+    questionsStore.toInitial();
+    questionsStore.setMaxIndex(NUMBER_OF_QUESTION);
+    statisticStore.toInitial();
     const questions = await getAllQuestions();
-    setQuestions(questions);
-    setAnswered(false);
+    questionsStore.setQuestions(questions);
     setLoading(false);
-  };
-
-  const incrementNum = () => {
-    if (questionNum !== NUMBER_OF_QUESTION) {
-      setQuestionNum(questionNum + 1);
-      setAnswered(false);
-      setAnswer(null);
-    }
-  };
-
-  const onReplay = () => {
-    prepareQuestions();
-  };
-
-  const onAnswer = (answer: string) => {
-    setAnswered(true);
-    setAnswer(answer);
-    if (questions) {
-      const currQuestion = questions[questionNum];
-      if (answer === currQuestion.correct_answer) {
-        const diff = currQuestion.difficulty;
-        const stats = { ...statistics, [diff]: statistics[diff] + 1 };
-        setStatistics(stats);
-      }
-    }
   };
 
   useEffect(() => {
     prepareQuestions();
   }, []);
-
-  const done = questionNum === 15;
 
   return (
     <div className={classes.app}>
@@ -103,20 +65,20 @@ function App() {
         <h2 className={classes.text}>You have 15 questions to answer.</h2>
       </div>
       <div className={classes.content}>
-        {done ? (
+        {questionsStore.currentIndex === NUMBER_OF_QUESTION ? (
           <div className={classes.content}>
-            <Statistic stats={statistics} />
+            <Statistic />
             <Button
               className={classes.button}
               variant="contained"
               color="primary"
               endIcon={<ReplayIcon />}
-              onClick={onReplay}
+              onClick={prepareQuestions}
             >
               Pass Again
             </Button>
           </div>
-        ) : isLoading || !questions ? (
+        ) : isLoading || !questionsStore.questions ? (
           <ReactLoading
             type={"spin"}
             color={"#1565c0"}
@@ -125,19 +87,14 @@ function App() {
           />
         ) : (
           <div className={classes.content}>
-            <QuestionCard
-              questionInfo={questions[questionNum]}
-              questionNum={questionNum}
-              onAnswerCallback={onAnswer}
-              answer={answerState}
-            />
-            {isAnswered ? (
+            <QuestionCard />
+            {questionsStore.currentAnswer !== null ? (
               <Button
                 className={classes.button}
                 variant="contained"
                 color="primary"
                 endIcon={<KeyboardArrowRightOutlinedIcon />}
-                onClick={incrementNum}
+                onClick={questionsStore.incrementIndex}
               >
                 Next
               </Button>
@@ -147,6 +104,6 @@ function App() {
       </div>
     </div>
   );
-}
+});
 
 export default App;

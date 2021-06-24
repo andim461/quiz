@@ -3,12 +3,8 @@ import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-import Statistics from "../interfaces/Statistics";
 import { makeStyles } from "@material-ui/styles";
-
-interface StatsProps {
-  stats: Statistics;
-}
+import statisticStore from "../store/statisticStore";
 
 const useStyles = makeStyles({
   stats: {
@@ -34,7 +30,7 @@ const useStyles = makeStyles({
   },
 });
 
-const Statistic = (props: StatsProps) => {
+const Statistic = () => {
   const classes = useStyles();
   return (
     <Card className={classes.card} variant="outlined">
@@ -46,19 +42,19 @@ const Statistic = (props: StatsProps) => {
           <div className={classes.diff}>
             <Typography gutterBottom>Easy</Typography>
             <Typography color="textSecondary" gutterBottom>
-              {props.stats.easy}/5
+              {statisticStore.stats.easy}/5
             </Typography>
           </div>
           <div className={classes.diff}>
             <Typography gutterBottom>Medium</Typography>
             <Typography color="textSecondary" gutterBottom>
-              {props.stats.medium}/5
+              {statisticStore.stats.medium}/5
             </Typography>
           </div>
           <div className={classes.diff}>
             <Typography gutterBottom>Hard</Typography>
             <Typography color="textSecondary" gutterBottom>
-              {props.stats.hard}/5
+              {statisticStore.stats.hard}/5
             </Typography>
           </div>
         </div>
