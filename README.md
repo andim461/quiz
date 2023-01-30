@@ -4,6 +4,6 @@
 
 ## Available Scripts
 
-### `npm start` - запуск dev-сборки
+### `npm start` - dev
 
-### `npm run build` - запуск prod-сборки
+### `npm run build` - prod
