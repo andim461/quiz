@@ -1,6 +1,6 @@
 # Quiz
 
-## Доступен по ссылке: https://andim461.github.io/quiz/
+## https://andim461.github.io/quiz/
 
 ## Available Scripts
 
